@@ -41,8 +41,13 @@ let HintService = class HintService {
         return found;
     }
     async findRandom() {
-        const length = await this.data.count();
-        const id = Math.floor(Math.random() * length);
+        const hintList = await this.data.find();
+        const length = hintList.length;
+        if (length == 0) {
+            throw new common_2.NotFoundException();
+        }
+        const i = Math.floor(Math.random() * length);
+        const id = hintList[i].id;
         const found = await this.data.findOneBy({ id });
         if (!found) {
             throw new common_2.NotFoundException();

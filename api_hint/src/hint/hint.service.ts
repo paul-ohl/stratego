@@ -33,8 +33,13 @@ export class HintService {
   }
 
   async findRandom(): Promise<Hint> {
-    const length = await this.data.count();
-    const id = Math.floor(Math.random() * length);
+    const hintList = await this.data.find();
+    const length = hintList.length;
+    if (length == 0) {
+      throw new NotFoundException();
+    }
+    const i = Math.floor(Math.random() * length);
+    const id = hintList[i].id;
     const found = await this.data.findOneBy({ id });
     if (!found) {
       throw new NotFoundException();
