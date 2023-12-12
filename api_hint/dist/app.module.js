@@ -10,12 +10,28 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const config_1 = require("@nestjs/config");
+const hint_module_1 = require("./hint/hint.module");
+const typeorm_1 = require("@nestjs/typeorm");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [],
+        imports: [
+            config_1.ConfigModule.forRoot({}),
+            typeorm_1.TypeOrmModule.forRoot({
+                type: 'mariadb',
+                host: process.env.DB_HOST || 'localhost',
+                port: +process.env.DB_PORT || 3307,
+                username: process.env.DB_USERNAME || 'root',
+                password: process.env.DB_PASSWORD || 'root',
+                database: process.env.DB_NAME || 'stratego',
+                autoLoadEntities: true,
+                synchronize: true,
+            }),
+            hint_module_1.HintModule,
+        ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
