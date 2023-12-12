@@ -21,7 +21,7 @@ __decorate([
 ], Hint.prototype, "id", void 0);
 __decorate([
     (0, typeorm_2.Index)(),
-    (0, typeorm_2.Column)(),
+    (0, typeorm_2.Column)({ type: 'text' }),
     __metadata("design:type", String)
 ], Hint.prototype, "positions", void 0);
 exports.Hint = Hint = __decorate([

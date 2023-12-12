@@ -31,12 +31,16 @@ let HintService = class HintService {
         }
     }
     findAll() {
-        return `This action returns all hint`;
+        return this.data.find();
     }
-    findOne(id) {
-        return `This action returns a #${id} hint`;
+    async findOne(id) {
+        const found = await this.data.findOneBy({ id });
+        if (!found) {
+            throw new common_2.NotFoundException();
+        }
+        return found;
     }
-    async randomOne() {
+    async findRandom() {
         const length = await this.data.count();
         const id = Math.floor(Math.random() * length);
         const found = await this.data.findOneBy({ id });
@@ -45,11 +49,23 @@ let HintService = class HintService {
         }
         return found;
     }
-    update(id, updateHintDto) {
-        return `This action updates a #${id} hint`;
+    async update(id, dto) {
+        try {
+            let done = await this.data.update(id, dto);
+            if (done.affected != 1) {
+                throw new common_2.NotFoundException();
+            }
+        }
+        catch (e) {
+            throw e instanceof common_2.NotFoundException ? e : new common_2.ConflictException();
+        }
+        return this.findOne(id);
     }
-    remove(id) {
-        return `This action removes a #${id} hint`;
+    async remove(id) {
+        let done = await this.data.delete(id);
+        if (done.affected != 1) {
+            throw new common_2.NotFoundException();
+        }
     }
 };
 exports.HintService = HintService;

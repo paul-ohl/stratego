@@ -27,6 +27,9 @@ let HintController = class HintController {
     findAll() {
         return this.hintService.findAll();
     }
+    findRandom() {
+        return this.hintService.findRandom();
+    }
     findOne(id) {
         return this.hintService.findOne(+id);
     }
@@ -51,6 +54,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], HintController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('random'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], HintController.prototype, "findRandom", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),

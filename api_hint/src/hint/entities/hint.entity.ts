@@ -7,6 +7,6 @@ export class Hint {
   id: number;
 
   @Index()
-  @Column()
+  @Column({ type: 'text' })
   positions: string;
 }

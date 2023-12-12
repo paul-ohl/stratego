@@ -20,15 +20,19 @@ export class HintService {
     }
   }
 
-  findAll() {
-    return `This action returns all hint`;
+  findAll(): Promise<Hint[]> {
+    return this.data.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} hint`;
+  async findOne(id: number): Promise<Hint> {
+    const found = await this.data.findOneBy({ id });
+    if (!found) {
+      throw new NotFoundException();
+    }
+    return found;
   }
 
-  async randomOne(): Promise<Hint> {
+  async findRandom(): Promise<Hint> {
     const length = await this.data.count();
     const id = Math.floor(Math.random() * length);
     const found = await this.data.findOneBy({ id });
@@ -38,11 +42,22 @@ export class HintService {
     return found;
   }
 
-  update(id: number, updateHintDto: UpdateHintDto) {
-    return `This action updates a #${id} hint`;
+  async update(id: number, dto: UpdateHintDto): Promise<Hint> {
+    try {
+      let done = await this.data.update(id, dto);
+      if (done.affected != 1) {
+        throw new NotFoundException();
+      }
+    } catch (e) {
+      throw e instanceof NotFoundException ? e : new ConflictException();
+    }
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} hint`;
+  async remove(id: number): Promise<void> {
+    let done = await this.data.delete(id);
+    if (done.affected != 1) {
+      throw new NotFoundException();
+    }
   }
 }

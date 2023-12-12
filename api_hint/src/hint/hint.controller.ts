@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { HintService } from './hint.service';
 import { CreateHintDto } from './dto/create-hint.dto';
 import { UpdateHintDto } from './dto/update-hint.dto';
@@ -15,6 +23,11 @@ export class HintController {
   @Get()
   findAll() {
     return this.hintService.findAll();
+  }
+
+  @Get('random')
+  findRandom() {
+    return this.hintService.findRandom();
   }
 
   @Get(':id')

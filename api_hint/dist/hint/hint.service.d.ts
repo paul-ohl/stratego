@@ -6,9 +6,9 @@ export declare class HintService {
     private readonly data;
     constructor(data: Repository<Hint>);
     create(dto: CreateHintDto): Promise<Hint>;
-    findAll(): string;
-    findOne(id: number): string;
-    randomOne(): Promise<Hint>;
-    update(id: number, updateHintDto: UpdateHintDto): string;
-    remove(id: number): string;
+    findAll(): Promise<Hint[]>;
+    findOne(id: number): Promise<Hint>;
+    findRandom(): Promise<Hint>;
+    update(id: number, dto: UpdateHintDto): Promise<Hint>;
+    remove(id: number): Promise<void>;
 }

@@ -5,8 +5,9 @@ export declare class HintController {
     private readonly hintService;
     constructor(hintService: HintService);
     create(createHintDto: CreateHintDto): Promise<import("./entities/hint.entity").Hint>;
-    findAll(): string;
-    findOne(id: string): string;
-    update(id: string, updateHintDto: UpdateHintDto): string;
-    remove(id: string): string;
+    findAll(): Promise<import("./entities/hint.entity").Hint[]>;
+    findRandom(): Promise<import("./entities/hint.entity").Hint>;
+    findOne(id: string): Promise<import("./entities/hint.entity").Hint>;
+    update(id: string, updateHintDto: UpdateHintDto): Promise<import("./entities/hint.entity").Hint>;
+    remove(id: string): Promise<void>;
 }
