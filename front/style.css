@@ -1,0 +1,11 @@
+#board {
+  display: grid;
+  grid-template-columns: 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px;
+  gap: 5px;
+}
+
+.cell {
+	border: 1px solid black;
+	height: 50px;
+	text-align: center;
+}
