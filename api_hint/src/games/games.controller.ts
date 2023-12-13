@@ -24,6 +24,7 @@ export class GamesController {
 
   @Post(':id/toggle-ready')
   toggleReady(@Param('id') id: string, @Body() toggleReadyDto: ToggleReadyDto) {
+    console.log('toggleReadyDto');
     console.log(toggleReadyDto);
     return this.gamesService.toggleReady(+id, toggleReadyDto);
   }

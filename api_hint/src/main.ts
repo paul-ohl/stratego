@@ -9,7 +9,7 @@ async function bootstrap() {
   const corsOptions: CorsOptions = {
     origin: true, // Allow all origins
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify the allowed HTTP methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Specify the allowed headers
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Specify the allowed HTTP headers
     credentials: true, // Allow sending cookies from the client
   };
 

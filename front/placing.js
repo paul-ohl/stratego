@@ -1,54 +1,133 @@
-const setHint = function(board, hint) {
-	const positions = hint.positions;
-	for (let i = 0; i < positions.length; i++) {
-		const cell = board[i + 60];
-		const characterId = positions[i];
-		if (characterId == 0) {
-			cell.innerHTML = "F";
-		} else if (characterId == 11) {
-			cell.innerHTML = "B";
-		} else {
-			cell.innerHTML = characterId;
-		}
-		cell.classList.add(characterId);
-	}
-}
+const setHint = function (board, positions) {
+    for (let i = 0; i < positions.length; i++) {
+        const cell = board[i + 60];
+        const characterId = positions[i];
+        cell.innerHTML = decodeCharacters(characterId);
 
-const getHint = async function() {
-	// const response = await fetch("/api/hint/random", {
-	// 	method: "GET",
-	// 	headers: {
-	// 		"gameId": 1,
-	// 		"player": "blue",
-	// 	}
-	// });
-	// const hint = await response.json();
-	const hint = {
-		id: 8,
-		positions: [0, 10, 9, 8, 8, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 1, 11, 11, 11, 11, 11, 11]
-	};
-	setHint(board, hint);
-}
+        cell.classList.add(characterId);
+    }
+};
 
-const toggleReady = async function() {
-	const response = await fetch("/api/game", {
-		method: "PATCH",
-		headers: {
-			"gameId": 1,
-			"player": "blue"
-		},
-		body: {
-			"ready": !playerIsReady
-		}
-	});
-	if (response.ok) {
-		playerIsReady = !playerIsReady;
-		document.getElementById("ready-button").innerText =
-			playerIsReady ? "Ready" : "Not Ready";
-	}
-}
+const getHint = async function () {
+    var requestOptions = {
+        method: "GET",
+        redirect: "follow",
+    };
+    try {
+        response = await fetch(
+            "http://localhost:8080/hint/random",
+            requestOptions
+        );
+    } catch (error) {
+        console.log("error", error);
+    }
+    const hint = await response.json();
+    console.log(hint);
+    if (hint?.positions != null) {
+        array_of_positions = JSON.parse(hint.positions);
+        console.log(array_of_positions);
+        setHint(board, array_of_positions);
+    }
+};
+
+const toggleReady = async function () {
+    console.log(playerIsReady);
+    let url = `http://localhost:8080/games/${game.gameId}/toggle-ready`;
+    if (!playerIsReady) {
+        // on appuie sur le bouton ready
+        try {
+            positions = [];
+            for (cell of document.getElementsByClassName("cell")) {
+                if (cell.classList.contains("player-cell")) {
+                    console.log(cell.innerHTML == "" ? "0" : cell.innerHTML);
+
+                    positions.push(
+                        cell.innerHTML == ""
+                            ? 0
+                            : encodeCharacters(cell.innerHTML)
+                    );
+                }
+            }
+            const somme = positions.reduce(
+                (accumulateur, valeurCourante) =>
+                    accumulateur + (valeurCourante ? valeurCourante : 0),
+                0
+            );
+            console.log(somme);
+
+            my_positions = JSON.stringify(positions);
+
+            console.log(my_positions);
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            var raw = JSON.stringify({
+                color: game.isBlue ? "blue" : "red",
+                positions: my_positions,
+            });
+
+            console.log(raw);
+            var requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow",
+            };
+
+            response = await fetch(url, requestOptions);
+            let result = await response.json();
+            console.log(result);
+
+            if (response.ok) {
+                console.log("ok");
+                if (somme > 200) {
+                    playerIsReady = true;
+                    document.getElementById("ready-button").innerText =
+                        "Not Ready";
+                } else {
+                    alert("You must place all your characters");
+                }
+            } else {
+                alert("Error!");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    } else {
+        // on appuie sur le bouton not ready
+        try {
+            var requestOptions = {
+                method: "POST",
+                redirect: "follow",
+            };
+
+            var raw = JSON.stringify({
+                color: game.isBlue ? "blue" : "red",
+                positions: "[]",
+            });
+
+            response = await fetch(url, requestOptions);
+            let result = await response.json();
+            console.log(result);
+
+            if (response.ok) {
+                console.log("ok");
+                playerIsReady = false;
+                document.getElementById("ready-button").innerText =
+                    playerIsReady ? "Ready" : "Not Ready";
+            } else {
+                alert("Error!");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        document.getElementById("ready-button").innerText = "Ready";
+    }
+};
 
 let playerIsReady = false;
-const board = initializeBoard(true);
+game = new Game();
+game.getInfo();
+console.log(game);
+const board = initializeBoard(game.isBlue);
 drawBoard(board);
-setPlayerNames("Blue", "Red");

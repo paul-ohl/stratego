@@ -1,10 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+} from 'typeorm';
 import { PlayerStatus } from '../enums/player-status.enum';
+import { GameStatus } from '../enums/game-status.enum';
 
 @Entity()
 export class Game {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @CreateDateColumn()
+  creation_date: Date;
+
+  @Column({ nullable: true })
+  starting_date: Date;
+
+  @Column({ nullable: true })
+  ending_date: Date;
+
+  @Column()
+  status: GameStatus;
 
   @Column({ nullable: true })
   player_red_name: string;
@@ -29,4 +47,7 @@ export class Game {
 
   @Column({ type: 'text', nullable: true })
   last_event: string;
+
+  @Column({ nullable: true })
+  winner?: string;
 }

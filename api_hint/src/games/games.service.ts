@@ -7,6 +7,7 @@ import { Game } from './entities/game.entity';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { ToggleReadyDto } from './dto/toggle-ready.dto';
 import { PlayerStatus } from './enums/player-status.enum';
+import { GameStatus } from './enums/game-status.enum';
 import { MoveDto } from './dto/move.dto';
 
 @Injectable()
@@ -17,7 +18,8 @@ export class GamesService {
 
   async create(dto: CreateGameDto): Promise<Game> {
     try {
-      let result = await this.data.save(dto);
+      let dto_enrichi = { ...dto, status: 'C' as GameStatus };
+      let result = await this.data.save(dto_enrichi);
       return result;
     } catch (e) {
       throw new ConflictException();
@@ -31,23 +33,44 @@ export class GamesService {
       if (!find) {
         throw new NotFoundException();
       }
+
+      let array_of_positons = JSON.parse(dto.positions);
+      console.log('array_of_positons');
+      console.log(array_of_positons);
+      const somme = array_of_positons.reduce(
+        (accumulateur, valeurCourante) =>
+          accumulateur + (valeurCourante ? valeurCourante : 0),
+        0,
+      );
+      console.log(somme);
       if (dto.color == 'red') {
         console.log('red');
-        find.status_player_red = 'R' as PlayerStatus;
-        find.red_initial_positions = dto.positions;
+        if (somme < 200) {
+          find.status_player_red = 'C' as PlayerStatus;
+          find.red_initial_positions = '[]';
+        } else {
+          find.status_player_red = 'R' as PlayerStatus;
+          find.red_initial_positions = dto.positions;
+        }
       } else {
         console.log('blue');
-        find.status_player_blue = 'R' as PlayerStatus;
-        find.blue_initial_positions = dto.positions;
+        if (somme < 200) {
+          find.status_player_blue = 'C' as PlayerStatus;
+          find.blue_initial_positions = '[]';
+        } else {
+          find.status_player_blue = 'R' as PlayerStatus;
+          find.blue_initial_positions = dto.positions;
+        }
       }
 
       if (
         find.status_player_red == 'R' &&
         find.status_player_blue == 'R' &&
-        find.red_initial_positions &&
-        find.blue_initial_positions
+        find.red_initial_positions != '[]' &&
+        find.blue_initial_positions != '[]'
       ) {
         console.log('ready 2 ways');
+        find.starting_date = new Date();
         find.status_player_red = 'P' as PlayerStatus;
         find.status_player_blue = 'W' as PlayerStatus;
         let red_positions = JSON.parse(find.red_initial_positions);
@@ -71,7 +94,16 @@ export class GamesService {
         find.positions = JSON.stringify(positions);
       }
       console.log(find);
-      await this.data.update(id, find);
+      let patch = {
+        status_player_red: find.status_player_red,
+        status_player_blue: find.status_player_blue,
+        red_initial_positions: find.red_initial_positions,
+        blue_initial_positions: find.blue_initial_positions,
+        starting_date: find.starting_date,
+        positions: find.positions,
+      };
+
+      await this.data.update(id, patch);
     } catch (e) {
       throw e instanceof NotFoundException ? e : new ConflictException();
     }
