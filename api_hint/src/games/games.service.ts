@@ -18,7 +18,7 @@ export class GamesService {
 
   async create(dto: CreateGameDto): Promise<Game> {
     try {
-      let dto_enrichi = { ...dto, status: 'C' as GameStatus };
+      let dto_enrichi = { ...dto, status: 'S' as GameStatus };
       let result = await this.data.save(dto_enrichi);
       return result;
     } catch (e) {
@@ -76,7 +76,7 @@ export class GamesService {
         let red_positions = JSON.parse(find.red_initial_positions);
         let red_positions_objects = [];
         for (let i = 0; i < red_positions.length; i++) {
-          let piece = { color: 'red', rank: red_positions[i] };
+          let piece = { color: 'red', rank: red_positions[i], hidden: true };
           red_positions_objects.push(piece);
         }
         let blue_positions = JSON.parse(find.blue_initial_positions)
@@ -163,10 +163,26 @@ export class GamesService {
     return this.data.find();
   }
 
-  async findOne(id: number): Promise<Game> {
+  async findOne(id: number, color: string = ''): Promise<Game> {
     const found = await this.data.findOneBy({ id });
     if (!found) {
       throw new NotFoundException();
+    }
+    if (color) {
+      let positions = JSON.parse(found.positions);
+      let positions_filtered = [];
+      for (let i = 0; i < positions.length; i++) {
+        let piece = positions[i];
+        if ((piece && piece.color == color) || piece?.hidden == false) {
+          positions_filtered.push(piece);
+        } else {
+          if (piece) {
+            piece.rank = '';
+          }
+          positions_filtered.push(piece);
+        }
+      }
+      found.positions = JSON.stringify(positions_filtered);
     }
     return found;
   }

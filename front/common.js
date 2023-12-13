@@ -26,11 +26,18 @@ class Game {
             console.log(game_info);
             this.bluePlayerName = game_info.player_blue_name;
             this.redPlayerName = game_info.player_red_name;
+            this.bluePlayerStatus = game_info.status_player_blue;
+            this.redPlayerStatus = game_info.status_player_red;
             console.log(this.isBlue);
             console.log(this.bluePlayerName);
             console.log(this.redPlayerName);
             if (game.isBlue) {
-                setPlayerNames(this.bluePlayerName, this.redPlayerName);
+                setPlayerNames(
+                    this.bluePlayerName,
+                    this.redPlayerName,
+                    this.bluePlayerStatus,
+                    this.redPlayerStatus
+                );
             } else {
                 setPlayerNames(this.redPlayerName, this.bluePlayerName);
             }
@@ -40,9 +47,16 @@ class Game {
     }
 }
 
-const setPlayerNames = function (player, opponent) {
-    document.getElementById("player-name").innerText = player;
-    document.getElementById("opponent-name").innerText = opponent;
+const setPlayerNames = function (
+    player,
+    opponent,
+    playerStatus,
+    opponentStatus
+) {
+    document.getElementById("player-name").innerText =
+        player + " " + playerStatusDict[playerStatus];
+    document.getElementById("opponent-name").innerText =
+        opponent + " " + playerStatusDict[opponentStatus];
 };
 
 const initializeBoard = function (isBlue) {
@@ -95,4 +109,13 @@ const encodeCharacters = function (character) {
     return +Object.keys(characters).find(
         (key) => characters[key] === character
     );
+};
+
+const playerStatusDict = {
+    C: "Choosing",
+    R: "Ready !",
+    P: "Playing",
+    W: "Waiting ...",
+    N: "Winner !",
+    Q: "Quit",
 };
