@@ -2,7 +2,8 @@ const redColor = "#8B0000";
 const blueColor = "#1434A4";
 
 class Game {
-    constructor() {
+    constructor(playing) {
+        this.playing = playing;
         this.url = new URL(window.location.href);
         this.gameId = this.url.searchParams.get("id");
         this.isBlue =
@@ -28,6 +29,7 @@ class Game {
             this.redPlayerName = game_info.player_red_name;
             this.bluePlayerStatus = game_info.status_player_blue;
             this.redPlayerStatus = game_info.status_player_red;
+            this.positions = JSON.parse(game_info.positions);
             console.log(this.isBlue);
             console.log(this.bluePlayerName);
             console.log(this.redPlayerName);
@@ -39,7 +41,23 @@ class Game {
                     this.redPlayerStatus
                 );
             } else {
-                setPlayerNames(this.redPlayerName, this.bluePlayerName);
+                setPlayerNames(
+                    this.redPlayerName,
+                    this.bluePlayerName,
+                    this.redPlayerStatus,
+                    this.bluePlayerStatus
+                );
+            }
+            const board = initializeBoard(game);
+            console.log(board);
+            drawBoard(board);
+            if (
+                (this.playing &&
+                    this.isBlue &&
+                    this.bluePlayerStatus === "P") ||
+                (this.playing && !this.isBlue && this.redPlayerStatus === "P")
+            ) {
+                drawPlayableCells(board);
             }
         } catch (error) {
             console.log("error", error);
@@ -59,13 +77,17 @@ const setPlayerNames = function (
         opponent + " " + playerStatusDict[opponentStatus];
 };
 
-const initializeBoard = function (isBlue) {
+const initializeBoard = function (game) {
+    const isBlue = game.isBlue;
     const transparentCells = [42, 43, 52, 53, 46, 47, 56, 57];
     const board = [];
     for (let i = 0; i < 100; i++) {
         const cell = document.createElement("div");
         cell.className = "cell";
-        // cell.innerHTML = i;
+        cell.innerHTML =
+            game.positions[i] == null
+                ? ""
+                : decodeCharacters(game.positions[i].rank);
         if (transparentCells.includes(i)) cell.style.opacity = 0;
         else if (i < 40) {
             cell.classList.add(isBlue ? "player-cell" : "opponent-cell");

@@ -17,18 +17,6 @@ const getSurroundingCells = function (cellId) {
 };
 
 async function move(board, originId, destinationId) {
-    // const response = await fetch("/api/game/move", {
-    // 	method: "PUT",
-    // 	headers: {
-    // 		gameId: 1,
-    // 		player: "blue",
-    // 		origin: originId,
-    // 		destination: destinationId,
-    // 	}
-    // });
-    // if (!await response.ok) {
-    // 	alert("Error!");
-    // }
     [board[originId], board[destinationId]] = [
         board[destinationId],
         board[originId],
@@ -43,10 +31,24 @@ async function move(board, originId, destinationId) {
         }
         cell.classList.remove("playable-cell", "possible-move-cell");
         cell.replaceWith(cell.cloneNode(true));
-        // let cellCopy = cell.cloneNode(true);
-        // cell.parentNode.replaceChild(cellCopy, cell);
     }
     // drawPlayableCells(board);
+    const response = await fetch(
+        `http://localhost:8080/games/${game.gameId}/move`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                origine: originId,
+                destination: destinationId,
+            }),
+        }
+    );
+    if (!(await response.ok)) {
+        alert("Error!");
+    }
 }
 
 function drawPossibleMoves(board, idx) {
@@ -96,7 +98,9 @@ function drawPlayableCells(board) {
     }
 }
 
-const board = initializeBoard(true);
+game = new Game(true);
+game.getInfo();
+const board = initializeBoard(game);
+console.log(board);
 drawBoard(board);
-setPlayerNames("Blue", "Red");
 drawPlayableCells(board);

@@ -126,8 +126,6 @@ const toggleReady = async function () {
 };
 
 let playerIsReady = false;
-game = new Game();
+game = new Game(false);
 game.getInfo();
 console.log(game);
-const board = initializeBoard(game.isBlue);
-drawBoard(board);
