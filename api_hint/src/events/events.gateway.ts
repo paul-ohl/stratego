@@ -23,9 +23,6 @@ export class EventsGateway {
 	handleConnection(socket: Socket) {
 		const ip = socket.client.conn.remoteAddress;
 		EventsGateway.LOGGER.log(`Gateway <- New client: @${socket.id}`);
-		this.server.emit(EventsGateway.CONNECTION_CHANNEL, `Welcome @${socket.id} on @${ip}!`);
-		socket.broadcast.emit(EventsGateway.CONNECTION_CHANNEL, "Other stuff");
-		return `Other other stuff`;
 	}
 
 	@SubscribeMessage('joinGame')

@@ -163,6 +163,10 @@ export class GamesService {
     return this.data.find();
   }
 
+  findSetupGames(): Promise<Game[]> {
+    return this.data.find({ where: { status: GameStatus.SETUP } });
+  }
+
   async findOne(id: number, color: string = ''): Promise<Game> {
     const found = await this.data.findOneBy({ id });
     if (!found) {

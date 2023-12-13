@@ -40,6 +40,11 @@ export class GamesController {
     return this.gamesService.findAll();
   }
 
+  @Get('/setup')
+  findSetupGames() {
+    return this.gamesService.findSetupGames();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string, @Query('color') color: string) {
     return this.gamesService.findOne(+id, color ? color : null);
