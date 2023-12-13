@@ -115,6 +115,7 @@ export class GamesService {
     try {
       let find = await this.data.findOneBy({ id });
       if (!find) {
+        console.log('find null');
         throw new NotFoundException();
       }
       let positions = JSON.parse(find.positions);
@@ -123,36 +124,67 @@ export class GamesService {
       let piece_origine = positions[origine];
       let piece_destination = positions[destination];
       if (!piece_origine) {
+        let i = 0;
+        positions.forEach((element) => {
+          console.log(i);
+          i += 1;
+          console.log(element);
+        });
+        console.log('piece_origine null');
         throw new NotFoundException();
       }
       if (!piece_destination) {
         console.log('piece_destination null');
         positions[destination] = piece_origine;
         positions[origine] = null;
+        console.log(positions);
         find.positions = JSON.stringify(positions);
+        console.log(find);
         find.last_event = `Piece ${piece_origine.rank} ${piece_origine.color}  avance`;
-        await this.data.update(id, find);
       } else {
         if (piece_origine.color == piece_destination.color) {
           console.log('piece_destination color');
           throw new NotFoundException();
         }
         if (piece_origine.rank > piece_destination.rank) {
-          console.log('piece_destination rank');
+          console.log('piece_destination rank mois forte');
           positions[destination] = piece_origine;
           positions[origine] = null;
+          console.log('positions done');
           find.positions = JSON.stringify(positions);
           find.last_event = `Piece ${piece_origine.rank} ${piece_origine.color} a mangé la piece ${piece_destination.color} ${piece_destination.rank}`;
-          await this.data.update(id, find);
+        }
+        if (piece_origine.rank == piece_destination.rank) {
+          console.log('piece_destination rank égale');
+          positions[origine] = null;
+          positions[destination] = null;
+          find.positions = JSON.stringify(positions);
+          find.last_event = `Piece ${piece_origine.rank} ${piece_origine.color} et la piece ${piece_destination.color} ${piece_destination.rank} s'entredétruisent`;
         } else {
-          console.log('piece_destination rank');
+          console.log('piece_destination rank plus forte');
+          console.log(positions);
           positions[origine] = null;
           find.positions = JSON.stringify(positions);
+          console.log(find.positions);
+
           find.last_event = `Piece ${piece_origine.rank} ${piece_origine.color} a été mangé par la piece ${piece_destination.color} ${piece_destination.rank}`;
-          await this.data.update(id, find);
+
+          console.log(find.last_event);
         }
       }
+      let status_player_blue = find.status_player_blue;
+      let status_player_red = find.status_player_red;
+      let patch = {
+        status_player_red: status_player_blue as PlayerStatus,
+        status_player_blue: status_player_red as PlayerStatus,
+        positions: find.positions,
+        last_event: find.last_event,
+      };
 
+      console.log(patch);
+
+      await this.data.update(id, patch);
+      console.log('update fait');
       return await this.data.findOneBy({ id });
     } catch (e) {
       throw e instanceof NotFoundException ? e : new ConflictException();

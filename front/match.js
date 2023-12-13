@@ -33,17 +33,18 @@ async function move(board, originId, destinationId) {
         cell.replaceWith(cell.cloneNode(true));
     }
     // drawPlayableCells(board);
+    let raw = JSON.stringify({
+        origine: originId,
+        destination: destinationId,
+    });
     const response = await fetch(
-        `http://localhost:8080/games/${game.gameId}/move`,
+        `http://localhost:${port}/games/${game.gameId}/move`,
         {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                origine: originId,
-                destination: destinationId,
-            }),
+            body: raw,
         }
     );
     if (!(await response.ok)) {
@@ -77,6 +78,7 @@ function drawPossibleMoves(board, idx) {
 }
 
 function drawPlayableCells(board) {
+    let list = game.isBlue ? board.reverse() : board;
     for ([idx, cell] of board.entries()) {
         if (!cell.classList.contains("player-cell")) {
             continue;

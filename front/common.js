@@ -1,6 +1,8 @@
 const redColor = "#8B0000";
 const blueColor = "#1434A4";
 
+let port = 8080;
+
 class Game {
     constructor(playing) {
         this.playing = playing;
@@ -20,7 +22,9 @@ class Game {
             console.log(this.gameId);
 
             let response = await fetch(
-                `http://localhost:8080/games/${this.gameId}`,
+                `http://localhost:${port}/games/${this.gameId}?color=${
+                    this.isBlue ? "blue" : "red"
+                }`,
                 requestOptions
             );
             const game_info = await response.json();
@@ -81,21 +85,47 @@ const initializeBoard = function (game) {
     const isBlue = game.isBlue;
     const transparentCells = [42, 43, 52, 53, 46, 47, 56, 57];
     const board = [];
+    console.log(game.positions);
     for (let i = 0; i < 100; i++) {
+        console.log(
+            i,
+            game.positions[i],
+            typeof game.positions[i],
+            game.positions[i] == null
+        );
         const cell = document.createElement("div");
         cell.className = "cell";
-        cell.innerHTML =
-            game.positions[i] == null
-                ? ""
-                : decodeCharacters(game.positions[i].rank);
-        if (transparentCells.includes(i)) cell.style.opacity = 0;
-        else if (i < 40) {
-            cell.classList.add(isBlue ? "player-cell" : "opponent-cell");
-            cell.style.backgroundColor = blueColor;
-        } else if (i > 59) {
-            cell.classList.add(isBlue ? "opponent-cell" : "player-cell");
-            cell.style.backgroundColor = redColor;
+
+        if (game.positions[i] == null || game.positions[i].rank == "") {
+            cell.innerHTML = "";
+        } else if (game.positions[i]?.rank == "") {
+            cell.innerHTML = "X";
+        } else {
+            cell.innerHTML = decodeCharacters(game.positions[i]?.rank);
         }
+
+        if (transparentCells.includes(i)) {
+            cell.style.opacity = 0;
+        } else if (game.positions[i] == null) {
+            cell.classList.add("playable-cell");
+        } else if (isBlue) {
+            if (game.positions[i]?.color == "blue") {
+                cell.classList.add("player-cell");
+                cell.style.backgroundColor = blueColor;
+            } else {
+                cell.classList.add("opponent-cell");
+                cell.style.backgroundColor = redColor;
+            }
+        } else {
+            if (game.positions[i]?.color == "red") {
+                cell.classList.add("player-cell");
+                cell.style.backgroundColor = redColor;
+            } else {
+                cell.classList.add("opponent-cell");
+                cell.style.backgroundColor = blueColor;
+            }
+        }
+
         if (isBlue) board.unshift(cell);
         else board.push(cell);
     }

@@ -9,13 +9,13 @@ const setHint = function (board, positions) {
 };
 
 const getHint = async function () {
-    var requestOptions = {
-        method: "GET",
-        redirect: "follow",
-    };
     try {
+        var requestOptions = {
+            method: "GET",
+            redirect: "follow",
+        };
         response = await fetch(
-            "http://localhost:8080/hint/random",
+            `http://localhost:${port}/hint/random`,
             requestOptions
         );
     } catch (error) {
@@ -32,7 +32,7 @@ const getHint = async function () {
 
 const toggleReady = async function () {
     console.log(playerIsReady);
-    let url = `http://localhost:8080/games/${game.gameId}/toggle-ready`;
+    let url = `http://localhost:${port}/games/${game.gameId}/toggle-ready`;
     if (!playerIsReady) {
         // on appuie sur le bouton ready
         try {
