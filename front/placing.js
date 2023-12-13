@@ -1,30 +1,3 @@
-const setPlayerNames = function(player, opponent) {
-	document.getElementById("player-name").innerText = player;
-	document.getElementById("opponent-name").innerText = opponent;
-}
-
-const initializeBoard = function(isBlue) {
-	const transparentCells = [42, 43, 52, 53, 46, 47, 56, 57];
-	const board = [];
-	for (let i = 0; i < 100; i++) {
-		const cell = document.createElement("div");
-		cell.className = "cell";
-		cell.innerHTML = i;
-		if (transparentCells.includes(i))
-			cell.style.opacity = 0;
-		else if (i < 40) {
-			cell.classList.add("opponent-cell")
-			cell.style.backgroundColor = isBlue ? redColor : blueColor;
-		}
-		else if (i > 59) {
-			cell.classList.add("player-cell");
-			cell.style.backgroundColor = isBlue ? blueColor : redColor;
-		}
-		board.push(cell);
-	}
-	return board;
-}
-
 const setHint = function(board, hint) {
 	const positions = hint.positions;
 	for (let i = 0; i < positions.length; i++) {
@@ -42,7 +15,7 @@ const setHint = function(board, hint) {
 }
 
 const getHint = async function() {
-	// const response = await fetch("/api/hint/", {
+	// const response = await fetch("/api/hint/random", {
 	// 	method: "GET",
 	// 	headers: {
 	// 		"gameId": 1,
@@ -78,4 +51,4 @@ const toggleReady = async function() {
 let playerIsReady = false;
 const board = initializeBoard(true);
 drawBoard(board);
-setPlayerNames("Paul", "Léa");
+setPlayerNames("Blue", "Red");

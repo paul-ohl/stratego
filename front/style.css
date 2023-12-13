@@ -24,7 +24,7 @@
 
 main {
 	margin: auto;
-	max-width: 800px;
+	max-width: 950px;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-around;

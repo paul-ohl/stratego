@@ -11,21 +11,21 @@
 
 <body>
 	<main>
-		<div>
-			<button onclick="getHint()">Shuffle</button>
+		<div style="width: 200;">
+			<p>Opponent losses: <span id="opponent-losses">0</span></p>
+			<p>Player losses: <span id="player-losses">0</span></p>
 		</div>
 		<div id="board-and-names">
 			<h2 id="opponent-name"></h2>
 			<div id="board"></div>
 			<h2 id="player-name"></h2>
 		</div>
-		<div>
-			<button onclick="toggleReady()" id="ready-button">Ready</button>
+		<div style="width: 200;">
 			<button onclick="exitGame()">Exit</button>
 		</div>
 	</main>
 	<script src="common.js"></script>
-	<script src="placing.js"></script>
+	<script src="game.js"></script>
 </body>
 
 </html>
