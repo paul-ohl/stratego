@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>Stratego</title>
+	<link rel="stylesheet" href="./style.css" />
+	<script src="https://cdn.socket.io/4.3.2/socket.io.min.js"
+		integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs"
+		crossorigin="anonymous"></script>
+</head>
+
+<body>
+	<main>
+		<div>
+			<h2>There are players waiting for you!</h2>
+			<div id="games-list"></div>
+		</div>
+		<div>
+			<h2>Or you can start a new game!</h2>
+			<button onclick="createGame()">Create Game</button>
+		</div>
+	</main>
+	<script src="index.js"></script>
+</body>
+
+</html>

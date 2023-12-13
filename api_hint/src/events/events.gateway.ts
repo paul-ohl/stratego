@@ -50,6 +50,15 @@ export class EventsGateway {
 		return "Sent update";
 	}
 
+	@SubscribeMessage('updateGameList')
+	handleUpdateGameList(
+		@ConnectedSocket() socket: Socket,
+	): string {
+		this.server.emit('updateGameList');
+		// socket.emit('updateGameList');
+		return "Sent update";
+	}
+
 	handleDisconnect(socket: Socket) {
 		// const ip = socket.client.conn.remoteAddress;
 		this.server.emit(EventsGateway.CONNECTION_CHANNEL, `@${socket.id} is gone`);
