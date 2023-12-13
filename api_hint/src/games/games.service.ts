@@ -9,6 +9,7 @@ import { ToggleReadyDto } from './dto/toggle-ready.dto';
 import { PlayerStatus } from './enums/player-status.enum';
 import { GameStatus } from './enums/game-status.enum';
 import { MoveDto } from './dto/move.dto';
+import { JoinGameDto } from './dto/join-game.dto';
 
 @Injectable()
 export class GamesService {
@@ -189,6 +190,19 @@ export class GamesService {
       found.positions = JSON.stringify(positions_filtered);
     }
     return found;
+  }
+
+  async joinGame(id: number, dto: JoinGameDto): Promise<Game> {
+    try {
+      let done = await this.data.update(id, dto);
+      // if (done.affected != 1) {
+      //   throw new NotFoundException();
+      // }
+    } catch (e) {
+      console.log(e);
+      throw e instanceof NotFoundException ? e : new ConflictException();
+    }
+    return this.findOne(id);
   }
 
   async update(id: number, dto: UpdateGameDto): Promise<Game> {
