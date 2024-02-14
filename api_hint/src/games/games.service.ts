@@ -15,7 +15,7 @@ import { JoinGameDto } from './dto/join-game.dto';
 export class GamesService {
   constructor(
     @InjectRepository(Game) private readonly data: Repository<Game>,
-  ) {}
+  ) { }
 
   async create(dto: CreateGameDto): Promise<Game> {
     try {
@@ -268,10 +268,11 @@ export class GamesService {
 
   async joinGame(id: number, dto: JoinGameDto): Promise<Game> {
     try {
-      let done = await this.data.update(id, dto);
-      // if (done.affected != 1) {
-      //   throw new NotFoundException();
-      // }
+      let enriched_dto = { ...dto, status: GameStatus.MATCH };
+      let done = await this.data.update(id, enriched_dto);
+      if (done.affected != 1) {
+        throw new NotFoundException();
+      }
     } catch (e) {
       console.log(e);
       throw e instanceof NotFoundException ? e : new ConflictException();
