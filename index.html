@@ -1,72 +1,76 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Game Board</title>
-        <style>
-            table {
-                border-collapse: collapse;
+
+<head>
+  <title>Game Board</title>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+
+    table td {
+      border: 1px solid black;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Game Board</h1>
+
+  <table id="game-board"></table>
+
+  <script>
+    fetch("http://localhost:8081/games/1")
+      .then((response) => response.json())
+      .then((data) => {
+        const gameBoard = document.getElementById("game-board");
+        const positions = JSON.parse(data.positions);
+        const last_event = data.last_event;
+        const last_event_text = document.createElement("p");
+        last_event_text.textContent = last_event;
+        gameBoard.appendChild(last_event_text);
+
+        for (let i = 0; i < 10; i++) {
+          const row = document.createElement("tr");
+          for (let j = 0; j < 10; j++) {
+            const cell = document.createElement("td");
+            let number = null;
+            let player = "none";
+            if (positions[i * 10 + j]) {
+              number = positions[i * 10 + j].rank;
+              player = positions[i * 10 + j].color;
             }
-            table td {
-                border: 1px solid black;
-                width: 30px;
-                height: 30px;
-                text-align: center;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Game Board</h1>
+            cell.textContent = number;
+            cell.title = `Cell ${i * 10 + j}`;
+            cell.style.backgroundColor = getColorForNumber(
+              number,
+              player
+            );
+            cell.style.color = "white";
+            row.appendChild(cell);
+          }
+          gameBoard.appendChild(row);
+        }
+      })
+      .catch((error) => console.error(error));
 
-        <table id="game-board"></table>
+    function getColorForNumber(number, color) {
+      if (!number) {
+        number = -3;
+      }
+      n = number.toString();
+      if (color == "red") {
+        return `rgb(${230 - 6 * n}, 0, 0)`;
+      } else if (color == "blue") {
+        return `rgb(0, 0, ${230 - 6 * n})`;
+      } else {
+        return "white";
+      }
+    }
+  </script>
+</body>
 
-        <script>
-            fetch("http://localhost:8080/games/1")
-                .then((response) => response.json())
-                .then((data) => {
-                    const gameBoard = document.getElementById("game-board");
-                    const positions = JSON.parse(data.positions);
-                    const last_event = data.last_event;
-                    const last_event_text = document.createElement("p");
-                    last_event_text.textContent = last_event;
-                    gameBoard.appendChild(last_event_text);
-
-                    for (let i = 0; i < 10; i++) {
-                        const row = document.createElement("tr");
-                        for (let j = 0; j < 10; j++) {
-                            const cell = document.createElement("td");
-                            let number = null;
-                            let player = "none";
-                            if (positions[i * 10 + j]) {
-                                number = positions[i * 10 + j].rank;
-                                player = positions[i * 10 + j].color;
-                            }
-                            cell.textContent = number;
-                            cell.title = `Cell ${i * 10 + j}`;
-                            cell.style.backgroundColor = getColorForNumber(
-                                number,
-                                player
-                            );
-                            cell.style.color = "white";
-                            row.appendChild(cell);
-                        }
-                        gameBoard.appendChild(row);
-                    }
-                })
-                .catch((error) => console.error(error));
-
-            function getColorForNumber(number, color) {
-                if (!number) {
-                    number = -3;
-                }
-                n = number.toString();
-                if (color == "red") {
-                    return `rgb(${230 - 6 * n}, 0, 0)`;
-                } else if (color == "blue") {
-                    return `rgb(0, 0, ${230 - 6 * n})`;
-                } else {
-                    return "white";
-                }
-            }
-        </script>
-    </body>
 </html>
