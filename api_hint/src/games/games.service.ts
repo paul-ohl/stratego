@@ -29,9 +29,14 @@ export class GamesService {
 
   async toggleReady(id: number, dto: ToggleReadyDto): Promise<Game> {
     try {
+      console.log('service : toggleReady');
       console.log(dto);
-      let find = await this.data.findOneBy({ id });
-      if (!find) {
+      console.log('id :', id);
+      let game = await this.data.findOneBy({ id });
+      console.log('game :');
+      console.log(game);
+      if (!game) {
+        console.log('game null');
         throw new NotFoundException();
       }
 
@@ -47,70 +52,105 @@ export class GamesService {
       if (dto.color == 'red') {
         console.log('red');
         if (somme < 200) {
-          find.status_player_red = 'C' as PlayerStatus;
-          find.red_initial_positions = '[]';
+          game.status_player_red = 'C' as PlayerStatus;
+          game.red_initial_positions = '[]';
         } else {
-          find.status_player_red = 'R' as PlayerStatus;
-          find.red_initial_positions = dto.positions;
+          game.status_player_red = 'R' as PlayerStatus;
+          game.red_initial_positions = dto.positions;
         }
       } else {
         console.log('blue');
         if (somme < 200) {
-          find.status_player_blue = 'C' as PlayerStatus;
-          find.blue_initial_positions = '[]';
+          game.status_player_blue = 'C' as PlayerStatus;
+          game.blue_initial_positions = '[]';
         } else {
-          find.status_player_blue = 'R' as PlayerStatus;
-          find.blue_initial_positions = dto.positions;
+          game.status_player_blue = 'R' as PlayerStatus;
+          game.blue_initial_positions = dto.positions;
         }
       }
 
       if (
-        find.status_player_red == 'R' &&
-        find.status_player_blue == 'R' &&
-        find.red_initial_positions != '[]' &&
-        find.blue_initial_positions != '[]'
+        game.status_player_red == 'R' &&
+        game.status_player_blue == 'R' &&
+        game.red_initial_positions != '[]' &&
+        game.blue_initial_positions != '[]'
       ) {
         console.log('ready 2 ways');
-        find.starting_date = new Date();
-        find.status_player_red = 'P' as PlayerStatus;
-        find.status_player_blue = 'W' as PlayerStatus;
-        let red_positions = JSON.parse(find.red_initial_positions);
-        let red_positions_objects = [];
-        for (let i = 0; i < red_positions.length; i++) {
+        game.starting_date = new Date();
+        game.status_player_red = 'P' as PlayerStatus;
+        game.status_player_blue = 'W' as PlayerStatus;
+      }
+
+      let red_positions = game.red_initial_positions
+        ? JSON.parse(game.red_initial_positions)
+        : [];
+      console.log('red_positions:');
+      console.log(red_positions);
+      let red_positions_objects = [];
+      if (red_positions.length <= 20) {
+        red_positions_objects = this.getEmptyPositions('red');
+      } else {
+        for (let i = 60; i < 100; i++) {
           let piece = { color: 'red', rank: red_positions[i], hidden: true };
           red_positions_objects.push(piece);
         }
-        let blue_positions = JSON.parse(find.blue_initial_positions)
-          .slice()
-          .reverse();
-        let blue_positions_objects = [];
-        for (let i = 0; i < blue_positions.length; i++) {
-          let piece = { color: 'blue', rank: blue_positions[i] };
+      }
+      console.log('red_positions_objects:');
+      console.log(red_positions_objects);
+
+      let blue_positions = game.blue_initial_positions
+        ? JSON.parse(game.blue_initial_positions)
+        : [];
+      blue_positions = blue_positions.slice().reverse();
+      console.log('blue_positions:');
+      console.log(blue_positions);
+      let blue_positions_objects = [];
+      if (blue_positions.length <= 20) {
+        blue_positions_objects = this.getEmptyPositions('blue');
+      } else {
+        for (let i = 0; i < 40; i++) {
+          let piece = { color: 'blue', rank: blue_positions[i], hidden: true };
           blue_positions_objects.push(piece);
         }
-        let empty_field = new Array(20).fill(null); //
-        let positions = blue_positions_objects
-          .concat(empty_field)
-          .concat(red_positions_objects);
-        find.positions = JSON.stringify(positions);
       }
-      console.log(find);
+      console.log('blue_positions_objects:');
+      console.log(blue_positions_objects);
+
+      let empty_field = new Array(20).fill(null);
+
+      let positions = blue_positions_objects
+        .concat(empty_field)
+        .concat(red_positions_objects);
+      game.positions = JSON.stringify(positions);
+
+      console.log(game);
       let patch = {
-        status_player_red: find.status_player_red,
-        status_player_blue: find.status_player_blue,
-        red_initial_positions: find.red_initial_positions,
-        blue_initial_positions: find.blue_initial_positions,
-        starting_date: find.starting_date,
-        positions: find.positions,
+        status_player_red: game.status_player_red,
+        status_player_blue: game.status_player_blue,
+        red_initial_positions: game.red_initial_positions,
+        blue_initial_positions: game.blue_initial_positions,
+        starting_date: game.starting_date,
+        positions: game.positions,
       };
+
+      console.log('patch :');
+      console.log(patch);
 
       await this.data.update(id, patch);
     } catch (e) {
+      console.log('error : ', e);
       throw e instanceof NotFoundException ? e : new ConflictException();
     }
     return this.findOne(id);
   }
 
+  getEmptyPositions(color: string) {
+    const newArray = Array.from({ length: 40 }, () => ({
+      color: color,
+      rank: null,
+    }));
+    return newArray;
+  }
   async move(id: number, dto: MoveDto): Promise<Game> {
     console.log(dto);
     try {

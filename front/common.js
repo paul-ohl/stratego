@@ -1,7 +1,7 @@
 const redColor = "#8B0000";
 const blueColor = "#1434A4";
 
-let port = 8080;
+let port = 8081;
 
 class Game {
     playerIsReady = false;
@@ -72,6 +72,8 @@ class Game {
 }
 
 const initializeBoard = function (game) {
+    console.log("initializeBoard");
+    console.log(game.positions);
     const isBlue = game.isBlue;
     const transparentCells = [42, 43, 52, 53, 46, 47, 56, 57];
     const board = [];
@@ -79,11 +81,16 @@ const initializeBoard = function (game) {
         const cell = document.createElement("div");
         cell.className = "cell";
 
-        if (game.positions[i] == null || game.positions[i].rank == "") {
+        if (
+            game.positions[i] == null ||
+            game.positions[i].rank === "" ||
+            game.positions[i].rank === null
+        ) {
             cell.innerHTML = "";
-        } else if (game.positions[i]?.rank == "") {
+        } else if (game.positions[i]?.rank === "") {
             cell.innerHTML = "X";
         } else {
+            console.log(i, game.positions[i]?.rank);
             cell.innerHTML = decodeCharacters(game.positions[i]?.rank);
         }
 

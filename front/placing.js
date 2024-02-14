@@ -36,7 +36,9 @@ const toggleReady = async function () {
             positions = [];
             for (cell of document.getElementsByClassName("cell")) {
                 positions.push(
-                    cell.innerHTML == "" ? 0 : encodeCharacters(cell.innerHTML)
+                    cell.innerHTML == ""
+                        ? null
+                        : encodeCharacters(cell.innerHTML)
                 );
             }
             const somme = positions.reduce(
@@ -46,23 +48,8 @@ const toggleReady = async function () {
             );
             my_positions = JSON.stringify(positions);
 
-            var myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-
-            var raw = JSON.stringify({
-                color: game.isBlue ? "blue" : "red",
-                positions: my_positions,
-            });
-
-            var requestOptions = {
-                method: "POST",
-                headers: myHeaders,
-                body: raw,
-                redirect: "follow",
-            };
-
-            response = await fetch(url, requestOptions);
-            let result = await response.json();
+            const response = await sendPostRequest(url, my_positions);
+            const result = await response.json();
 
             if (response.ok) {
                 if (somme > 200) {
@@ -80,18 +67,10 @@ const toggleReady = async function () {
     } else {
         // on appuie sur le bouton not ready
         try {
-            var requestOptions = {
-                method: "POST",
-                redirect: "follow",
-            };
+            my_positions = JSON.stringify([]);
 
-            var raw = JSON.stringify({
-                color: game.isBlue ? "blue" : "red",
-                positions: "[]",
-            });
-
-            response = await fetch(url, requestOptions);
-            let result = await response.json();
+            const response = await sendPostRequest(url, my_positions);
+            const result = await response.json();
 
             if (response.ok) {
                 playerIsReady = false;
@@ -104,7 +83,32 @@ const toggleReady = async function () {
         }
         document.getElementById("ready-button").innerText = "Ready";
     }
+    game.getInfo();
+    initializeBoard(game);
 };
+
+async function sendPostRequest(url, my_positions) {
+    console.log("send post request");
+    console.log("playerIsReady", playerIsReady);
+    console.log(my_positions);
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+        color: game.isBlue ? "blue" : "red",
+        positions: my_positions,
+    });
+
+    var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+    };
+
+    response = await fetch(url, requestOptions);
+    return response;
+}
 
 function refreshReadyButton() {
     console.log("refresh ready button");
@@ -114,12 +118,11 @@ function refreshReadyButton() {
     if (playerIsReady) {
         console.log("player is ready");
         document.getElementById("ready-button").innerText = "Not Ready";
-        old_text = old_text.replace("is Choosing", "is Ready !");
+        old_text = old_text.replace("is Choosing", "Ready !");
     } else {
         console.log("player is not ready");
         document.getElementById("ready-button").innerText = "Ready";
-        old_text = old_text.replace("Choosing", "Ready !");
-        old_text = old_text.replace("Ready !", "Choosing");
+        old_text = old_text.replace("Ready !", "is Choosing");
     }
 }
 
