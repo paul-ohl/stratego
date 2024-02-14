@@ -208,15 +208,17 @@ export class GamesService {
     if (color) {
       let positions = JSON.parse(found.positions);
       let positions_filtered = [];
-      for (let i = 0; i < positions.length; i++) {
-        let piece = positions[i];
-        if ((piece && piece.color == color) || piece?.hidden == false) {
-          positions_filtered.push(piece);
-        } else {
-          if (piece) {
-            piece.rank = '';
+      if (positions != null) {
+        for (let i = 0; i < positions.length; i++) {
+          let piece = positions[i];
+          if ((piece && piece.color == color) || piece?.hidden == false) {
+            positions_filtered.push(piece);
+          } else {
+            if (piece) {
+              piece.rank = '';
+            }
+            positions_filtered.push(piece);
           }
-          positions_filtered.push(piece);
         }
       }
       found.positions = JSON.stringify(positions_filtered);

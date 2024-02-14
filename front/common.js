@@ -4,6 +4,7 @@ const blueColor = "#1434A4";
 let port = 8080;
 
 class Game {
+    playerIsReady = false;
     constructor(playing) {
         this.playing = playing;
         this.url = new URL(window.location.href);
@@ -19,8 +20,6 @@ class Game {
             method: "GET",
         };
         try {
-            console.log(this.gameId);
-
             let response = await fetch(
                 `http://localhost:${port}/games/${this.gameId}?color=${
                     this.isBlue ? "blue" : "red"
@@ -28,24 +27,20 @@ class Game {
                 requestOptions
             );
             const game_info = await response.json();
-            console.log(game_info);
             this.bluePlayerName = game_info.player_blue_name;
             this.redPlayerName = game_info.player_red_name;
             this.bluePlayerStatus = game_info.status_player_blue;
             this.redPlayerStatus = game_info.status_player_red;
             this.positions = JSON.parse(game_info.positions);
-            console.log(this.isBlue);
-            console.log(this.bluePlayerName);
-            console.log(this.redPlayerName);
-            if (game.isBlue) {
-                setPlayerNames(
+            if (this.isBlue) {
+                this.setPlayerNames(
                     this.bluePlayerName,
                     this.redPlayerName,
                     this.bluePlayerStatus,
                     this.redPlayerStatus
                 );
             } else {
-                setPlayerNames(
+                this.setPlayerNames(
                     this.redPlayerName,
                     this.bluePlayerName,
                     this.redPlayerStatus,
@@ -53,7 +48,6 @@ class Game {
                 );
             }
             const board = initializeBoard(game);
-            console.log(board);
             drawBoard(board);
             if (
                 (this.playing &&
@@ -63,36 +57,25 @@ class Game {
             ) {
                 drawPlayableCells(board);
             }
-        } catch (error) {
-            console.log("error", error);
-        }
+        } catch (error) {}
+        console.log("check fin getInfo", this.playerIsReady);
+    }
+
+    setPlayerNames(player, opponent, playerStatus, opponentStatus) {
+        document.getElementById("player-name").innerText =
+            player + " " + playerStatusDict[playerStatus];
+        document.getElementById("opponent-name").innerText =
+            opponent + " " + playerStatusDict[opponentStatus];
+        this.playerIsReady = playerStatus !== "C";
+        console.log("playerIsReady func", this.playerIsReady);
     }
 }
-
-const setPlayerNames = function (
-    player,
-    opponent,
-    playerStatus,
-    opponentStatus
-) {
-    document.getElementById("player-name").innerText =
-        player + " " + playerStatusDict[playerStatus];
-    document.getElementById("opponent-name").innerText =
-        opponent + " " + playerStatusDict[opponentStatus];
-};
 
 const initializeBoard = function (game) {
     const isBlue = game.isBlue;
     const transparentCells = [42, 43, 52, 53, 46, 47, 56, 57];
     const board = [];
-    console.log(game.positions);
     for (let i = 0; i < 100; i++) {
-        console.log(
-            i,
-            game.positions[i],
-            typeof game.positions[i],
-            game.positions[i] == null
-        );
         const cell = document.createElement("div");
         cell.className = "cell";
 
